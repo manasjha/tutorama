@@ -35,6 +35,7 @@ export type Database = {
           role?: "parent" | "admin";
           updated_at?: string;
         };
+        Relationships: [];
       };
       student_profiles: {
         Row: {
@@ -74,6 +75,7 @@ export type Database = {
           onboarding_status?: string;
           updated_at?: string;
         };
+        Relationships: [];
       };
       tutors: {
         Row: {
@@ -113,6 +115,7 @@ export type Database = {
           notes?: string | null;
           updated_at?: string;
         };
+        Relationships: [];
       };
       tuitions: {
         Row: {
@@ -149,6 +152,7 @@ export type Database = {
           status?: string;
           updated_at?: string;
         };
+        Relationships: [];
       };
       topics: {
         Row: {
@@ -182,6 +186,7 @@ export type Database = {
           is_active?: boolean;
           updated_at?: string;
         };
+        Relationships: [];
       };
       classes: {
         Row: {
@@ -233,6 +238,7 @@ export type Database = {
           payment_status?: string;
           updated_at?: string;
         };
+        Relationships: [];
       };
       class_content: {
         Row: {
@@ -269,6 +275,7 @@ export type Database = {
           created_by?: string | null;
           updated_at?: string;
         };
+        Relationships: [];
       };
       payments: {
         Row: {
@@ -314,6 +321,7 @@ export type Database = {
           provider_payment_id?: string | null;
           updated_at?: string;
         };
+        Relationships: [];
       };
       events: {
         Row: {
@@ -341,6 +349,7 @@ export type Database = {
           properties?: Json;
           page_path?: string | null;
         };
+        Relationships: [];
       };
     };
     Functions: {
