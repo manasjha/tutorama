@@ -15,7 +15,7 @@ export function TutorQualitySection() {
       <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 sm:px-6">
         <LandingSectionHeading
           align="center"
-          body="Process-based credibility. No claims of verified, top, or best tutors."
+          body="We look for tutors who can explain clearly, solve step-by-step, and structure topics before pairing."
           title="How we review tutor fit"
         />
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

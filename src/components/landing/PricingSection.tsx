@@ -37,7 +37,7 @@ export function PricingSection({ loginHref }: PricingSectionProps) {
       <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 sm:px-6">
         <LandingSectionHeading
           align="center"
-          body="Simple service pricing for families starting with Tutorama in HSR."
+          body="Simple per-class pricing for HSR families, with a low-cost first class to get started."
           title="Pricing & Parent Expectations"
         />
         <div className="grid gap-4 lg:grid-cols-3">

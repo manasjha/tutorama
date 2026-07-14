@@ -36,7 +36,7 @@ const faqs = [
   {
     question: "What happens after I sign up?",
     answer:
-      "You will land in the Tutorama dashboard. The full student onboarding and booking journey will be handled in a future release.",
+      "After signing up, you’ll enter your Tutorama dashboard. From there, we’ll help you set up your child’s details and start the tuition booking journey.",
   },
   {
     question: "What if the tutor fit is not right?",
