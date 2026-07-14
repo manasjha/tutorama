@@ -24,7 +24,7 @@ export function TrackedDetails({
           void trackEvent({
             eventName: analyticsEvents.landingFaqOpened,
             pagePath: window.location.pathname,
-            properties: { question },
+            properties: { faq_question: question },
           });
         }
       }}
