@@ -15,6 +15,8 @@ export const analyticsEvents = {
   googleLoginClicked: "google_login_clicked",
   googleLoginCompleted: "google_login_completed",
   authErrorShown: "auth_error_shown",
+  postLoginRouted: "post_login_routed",
+  onboardingPageViewed: "onboarding_page_viewed",
   signupStarted: "signup_started",
   signupCompleted: "signup_completed",
   loginCompleted: "login_completed",

@@ -2,6 +2,9 @@ import Link from "next/link";
 
 import { TrackedLink } from "@/components/analytics/TrackedLink";
 import { LandingWordmark } from "@/components/landing/LandingWordmark";
+import { Button } from "@/components/ui/Button";
+import { UserAvatar } from "@/components/ui/UserAvatar";
+import { logout } from "@/features/auth/auth-actions";
 import { analyticsEvents } from "@/lib/analytics/events";
 import { appRoutes, publicRoutes } from "@/lib/constants/routes";
 import { launchAreaLabel } from "@/lib/constants/serviceArea";
@@ -10,11 +13,15 @@ import { cn } from "@/lib/utils/cn";
 type NavbarProps = {
   isAuthenticated?: boolean;
   variant?: "default" | "landing";
+  userAvatarUrl?: string | null;
+  userDisplayName?: string | null;
   userEmail?: string | null;
 };
 
 export function Navbar({
   isAuthenticated = false,
+  userAvatarUrl,
+  userDisplayName,
   userEmail,
   variant = "default",
 }: NavbarProps) {
@@ -26,6 +33,7 @@ export function Navbar({
     { href: "/#faq", label: "FAQ" },
   ];
   const logoHref = isAuthenticated ? appRoutes.dashboard : publicRoutes.home;
+  const accountLabel = userDisplayName || userEmail;
 
   return (
     <header
@@ -76,7 +84,25 @@ export function Navbar({
         >
           <span className="hidden xl:inline">{launchAreaLabel}</span>
           {isAuthenticated ? (
-            <span className="max-w-40 truncate text-text-primary">{userEmail}</span>
+            <>
+              <div className="flex min-w-0 items-center gap-2">
+                <UserAvatar
+                  avatarUrl={userAvatarUrl}
+                  displayName={userDisplayName}
+                  email={userEmail}
+                />
+                {accountLabel ? (
+                  <span className="hidden max-w-36 truncate text-text-primary sm:inline lg:max-w-44">
+                    {accountLabel}
+                  </span>
+                ) : null}
+              </div>
+              <form action={logout}>
+                <Button className="min-h-9 px-3 py-1.5" type="submit" variant="ghost">
+                  Log Out
+                </Button>
+              </form>
+            </>
           ) : isLanding ? (
             <>
               <TrackedLink

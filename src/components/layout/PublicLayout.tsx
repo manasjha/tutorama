@@ -7,12 +7,14 @@ import { Navbar } from "./Navbar";
 type PublicLayoutProps = {
   children: ReactNode;
   mainClassName?: string;
+  showNavbar?: boolean;
   variant?: "default" | "landing";
 };
 
 export function PublicLayout({
   children,
   mainClassName,
+  showNavbar = true,
   variant = "default",
 }: PublicLayoutProps) {
   const isLanding = variant === "landing";
@@ -24,7 +26,7 @@ export function PublicLayout({
         isLanding ? "bg-[#FDF8F0]" : "bg-background",
       )}
     >
-      <Navbar variant={variant} />
+      {showNavbar ? <Navbar variant={variant} /> : null}
       <main
         className={cn(
           isLanding

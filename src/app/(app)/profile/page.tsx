@@ -17,7 +17,7 @@ export default async function ProfilePage() {
   return (
     <PageShell
       title="Profile"
-      description="Parent account settings and student setup will live here."
+      description="Parent account settings and student setup details."
     >
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
@@ -37,8 +37,8 @@ export default async function ProfilePage() {
           </Card>
         ) : (
           <EmptyState
-            description="Future onboarding will collect student name, grade, board, and preferred subjects."
-            title="Student profile setup is next"
+            description="Add your child's learning profile details to help Tutorama understand their class, subjects, and tutoring requirement."
+            title="Student profile setup"
           />
         )}
       </div>

@@ -5,8 +5,10 @@ export const publicRoutes = {
 
 export const appRoutes = {
   dashboard: "/dashboard",
+  onboarding: "/onboarding",
   profile: "/profile",
   tuitions: "/tuitions",
+  classes: "/classes",
   scheduleClass: "/classes/schedule",
 };
 
@@ -21,6 +23,7 @@ export const adminRoutes = {
 
 export const protectedRoutePrefixes = [
   "/dashboard",
+  "/onboarding",
   "/profile",
   "/tuitions",
   "/classes",

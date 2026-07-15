@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { AppLayout } from "@/components/layout/AppLayout";
+import { getParentProfile } from "@/features/auth/profile-service";
 import { getFirstStudentProfile } from "@/features/students/student-service";
 import { publicRoutes } from "@/lib/constants/routes";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
@@ -26,10 +27,18 @@ export default async function LoggedInLayout({ children }: LoggedInLayoutProps) 
     redirect(publicRoutes.login);
   }
 
-  const student = await getFirstStudentProfile(user.id);
+  const [profile, student] = await Promise.all([
+    getParentProfile(supabase, user.id).catch(() => null),
+    getFirstStudentProfile(user.id),
+  ]);
 
   return (
-    <AppLayout studentName={student?.student_name} userEmail={user.email}>
+    <AppLayout
+      studentName={student?.student_name}
+      userAvatarUrl={profile?.avatar_url}
+      userDisplayName={profile?.display_name}
+      userEmail={user.email}
+    >
       {children}
     </AppLayout>
   );

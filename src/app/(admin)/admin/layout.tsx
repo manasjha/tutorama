@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { PageShell } from "@/components/layout/PageShell";
 import { ErrorState } from "@/components/ui/ErrorState";
-import { isAdminUser } from "@/features/admin/admin-service";
+import { getProfile } from "@/features/admin/admin-service";
 import { publicRoutes } from "@/lib/constants/routes";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 
@@ -30,11 +30,16 @@ export default async function AdminRouteLayout({
     redirect(publicRoutes.login);
   }
 
-  const isAdmin = await isAdminUser(user.id);
+  const profile = await getProfile(user.id);
+  const isAdmin = profile?.role === "admin";
 
   if (!isAdmin) {
     return (
-      <AdminLayout userEmail={user.email}>
+      <AdminLayout
+        userAvatarUrl={profile?.avatar_url}
+        userDisplayName={profile?.display_name}
+        userEmail={user.email}
+      >
         <PageShell
           title="Unauthorized"
           description="Founder admin tools are restricted to Tutorama admin accounts."
@@ -48,5 +53,13 @@ export default async function AdminRouteLayout({
     );
   }
 
-  return <AdminLayout userEmail={user.email}>{children}</AdminLayout>;
+  return (
+    <AdminLayout
+      userAvatarUrl={profile?.avatar_url}
+      userDisplayName={profile?.display_name}
+      userEmail={user.email}
+    >
+      {children}
+    </AdminLayout>
+  );
 }

@@ -15,6 +15,9 @@ export type Database = {
           email: string | null;
           phone: string | null;
           display_name: string | null;
+          avatar_url: string | null;
+          onboarding_status: "not_started" | "in_progress" | "completed";
+          last_login_at: string | null;
           role: "parent" | "admin";
           created_at: string;
           updated_at: string;
@@ -24,6 +27,9 @@ export type Database = {
           email?: string | null;
           phone?: string | null;
           display_name?: string | null;
+          avatar_url?: string | null;
+          onboarding_status?: "not_started" | "in_progress" | "completed";
+          last_login_at?: string | null;
           role?: "parent" | "admin";
           created_at?: string;
           updated_at?: string;
@@ -32,6 +38,9 @@ export type Database = {
           email?: string | null;
           phone?: string | null;
           display_name?: string | null;
+          avatar_url?: string | null;
+          onboarding_status?: "not_started" | "in_progress" | "completed";
+          last_login_at?: string | null;
           role?: "parent" | "admin";
           updated_at?: string;
         };

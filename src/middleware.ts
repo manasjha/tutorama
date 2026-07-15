@@ -29,12 +29,6 @@ export async function middleware(request: NextRequest) {
     return redirectResponse;
   }
 
-  if (user && pathname === "/login") {
-    const redirectResponse = NextResponse.redirect(new URL("/dashboard", request.url));
-    copyCookies(response, redirectResponse);
-    return redirectResponse;
-  }
-
   return response;
 }
 

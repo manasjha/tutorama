@@ -1,20 +1,21 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 
+import { LandingWordmark } from "@/components/landing/LandingWordmark";
 import { PublicLayout } from "@/components/layout/PublicLayout";
 import { Card } from "@/components/ui/Card";
 import { ErrorState } from "@/components/ui/ErrorState";
-import { Input } from "@/components/ui/Input";
+import { getParentProfile } from "@/features/auth/profile-service";
 import {
-  login,
-  loginWithGoogle,
-  signUp,
-} from "@/features/auth/auth-actions";
+  getAnalyticsOnboardingStatus,
+  getPostLoginDestination,
+} from "@/features/auth/routing";
 import { analyticsEvents } from "@/lib/analytics/events";
 import { trackEvent } from "@/lib/analytics/track";
-import { appRoutes } from "@/lib/constants/routes";
+import { publicRoutes } from "@/lib/constants/routes";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 
-import { LoginSubmitButton } from "./LoginSubmitButton";
+import { GoogleLoginButton } from "./GoogleLoginButton";
 
 type LoginPageProps = {
   searchParams: Promise<{
@@ -26,16 +27,21 @@ type LoginPageProps = {
 };
 
 const errorCopy: Record<string, string> = {
-  callback_failed: "We could not complete login. Please try again.",
+  callback_failed:
+    "Your Google sign-in could not be completed. Please return to login and try again.",
   email_not_confirmed:
-    "Please confirm your email before logging in. If you expected instant login, disable email confirmation in Supabase Auth settings for this environment.",
+    "Please finish confirming your email, then try again.",
   invalid_credentials: "That email and password did not match. Please try again.",
   login_failed: "We could not log you in. Check your email and password.",
-  oauth_failed: "Google login could not start. Please try again.",
+  google_callback_failed:
+    "Your Google sign-in could not be completed. Please return to login and try again.",
+  oauth_failed: "We couldn't connect to Google. Please try again.",
+  profile_setup_failed:
+    "You're signed in, but we couldn't finish setting up your Tutorama account. Please try again.",
   signup_failed:
     "We could not create your account. Please check the details and try again.",
   supabase_not_configured:
-    "Supabase is not configured yet. Add the public Supabase URL and anon key.",
+    "Google sign-in is not available in this environment yet.",
 };
 
 const messageCopy: Record<string, string> = {
@@ -50,16 +56,13 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   });
 
   const params = await searchParams;
-  const safeNext =
-    params.next?.startsWith("/") && !params.next.startsWith("//")
-      ? params.next
-      : appRoutes.dashboard;
+  const errorType = params.error && errorCopy[params.error] ? params.error : "unknown";
 
   if (params.error) {
     await trackEvent({
       eventName: analyticsEvents.authErrorShown,
       pagePath: "/login",
-      properties: { error_code: params.error },
+      properties: { error_type: errorType },
     });
   }
 
@@ -70,29 +73,43 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     } = await supabase.auth.getUser();
 
     if (user) {
-      redirect(appRoutes.dashboard);
+      const profile = await getParentProfile(supabase, user.id).catch(() => null);
+      const destination = getPostLoginDestination(profile?.onboarding_status);
+
+      await trackEvent({
+        eventName: analyticsEvents.postLoginRouted,
+        pagePath: "/login",
+        userId: user.id,
+        properties: {
+          auth_method: "existing_session",
+          destination,
+          onboarding_status: getAnalyticsOnboardingStatus(
+            profile?.onboarding_status,
+          ),
+        },
+      });
+
+      redirect(destination);
     }
   }
 
   return (
-    <PublicLayout>
-      <div className="mx-auto grid max-w-5xl gap-6">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-sm font-semibold uppercase text-progress-green">
-            Parent account
-          </p>
+    <PublicLayout showNavbar={false}>
+      <div className="mx-auto grid max-w-xl gap-6">
+        <div className="mx-auto grid max-w-2xl justify-items-center text-center">
+          <LandingWordmark />
           <h1 className="mt-2 font-heading text-3xl font-semibold text-text-primary sm:text-4xl">
             Enter Tutorama
           </h1>
           <p className="mt-3 text-sm leading-6 text-text-muted sm:text-base sm:leading-7">
-            Sign up or log in to book tuitions and start setting up your
-            child&apos;s learning journey.
+            Continue with Google to access your child&apos;s Tutorama setup,
+            classes, and progress updates.
           </p>
         </div>
 
         {params.error ? (
           <ErrorState
-            title="Auth needs attention"
+            title="Sign-in needs attention"
             message={errorCopy[params.error] ?? "Please try again."}
           />
         ) : null}
@@ -105,100 +122,27 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
         {!isSupabaseConfigured() ? (
           <ErrorState
-            title="Supabase setup required"
-            message="Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to .env.local before testing auth."
+            title="Google sign-in unavailable"
+            message="Google sign-in is not available in this environment yet."
           />
         ) : null}
 
         <Card className="rounded-lg">
-          <form action={loginWithGoogle} className="grid gap-4">
-            <input name="next" type="hidden" value={safeNext} />
-            <LoginSubmitButton
-              disabled={!isSupabaseConfigured()}
-              loadingText="Opening Google..."
-              variant="secondary"
-            >
-              Continue with Google
-            </LoginSubmitButton>
+          <div className="grid gap-4">
+            <GoogleLoginButton disabled={!isSupabaseConfigured()} />
             <p className="text-center text-xs leading-5 text-text-muted">
-              Google provider credentials are configured in Supabase, not in
-              client environment variables.
+              We use your basic Google profile to create and secure your
+              Tutorama account.
             </p>
-          </form>
+          </div>
         </Card>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          <Card className="rounded-lg">
-            <form action={signUp} className="grid gap-4">
-              <div>
-                <h2 className="font-heading text-xl font-semibold text-text-primary">
-                  Create account
-                </h2>
-                <p className="mt-1 text-sm leading-6 text-text-muted">
-                  For parents and guardians managing Tutorama classes.
-                </p>
-              </div>
-              <input name="next" type="hidden" value={safeNext} />
-              <Input
-                autoComplete="email"
-                label="Email"
-                name="email"
-                required
-                type="email"
-              />
-              <Input
-                autoComplete="new-password"
-                helperText="Use at least 8 characters."
-                label="Password"
-                minLength={8}
-                name="password"
-                required
-                type="password"
-              />
-              <LoginSubmitButton
-                disabled={!isSupabaseConfigured()}
-                loadingText="Creating account..."
-              >
-                Create Tutorama Account
-              </LoginSubmitButton>
-            </form>
-          </Card>
-
-          <Card className="rounded-lg">
-            <form action={login} className="grid gap-4">
-              <div>
-                <h2 className="font-heading text-xl font-semibold text-text-primary">
-                  Log in
-                </h2>
-                <p className="mt-1 text-sm leading-6 text-text-muted">
-                  Continue to your Tutorama dashboard.
-                </p>
-              </div>
-              <input name="next" type="hidden" value={safeNext} />
-              <Input
-                autoComplete="email"
-                label="Email"
-                name="email"
-                required
-                type="email"
-              />
-              <Input
-                autoComplete="current-password"
-                label="Password"
-                name="password"
-                required
-                type="password"
-              />
-              <LoginSubmitButton
-                disabled={!isSupabaseConfigured()}
-                loadingText="Logging in..."
-                variant="secondary"
-              >
-                Log In
-              </LoginSubmitButton>
-            </form>
-          </Card>
-        </div>
+        <Link
+          className="justify-self-center text-sm font-semibold text-trust-blue hover:text-trust-blue/80"
+          href={publicRoutes.home}
+        >
+          Back to Tutorama
+        </Link>
       </div>
     </PublicLayout>
   );
