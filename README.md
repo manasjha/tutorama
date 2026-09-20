@@ -102,6 +102,10 @@ npm run lint
 npm run build
 ```
 
+## Remote development workflow
+
+Feature work may be implemented through Codex Cloud on a feature branch, validated with `npm run lint` and `npm run build`, and tested through a Vercel Preview Deployment. Merge the feature branch into `main` only after approval.
+
 ## Deployment Notes
 
 Connect the GitHub repo to Vercel, set the same public Supabase variables in Vercel, and add the Vercel `/auth/callback` URL to Supabase Auth redirect URLs. Keep GitHub as the source of truth and deploy from `main`.
